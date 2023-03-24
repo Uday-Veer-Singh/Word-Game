@@ -1,24 +1,5 @@
 "use strict";
 
-const mediaRun = new IntersectionObserver((views) => {
-  views.forEach((view) => {
-    if (view.isIntersecting) {
-      view.target.classList.add("show");
-    } else {
-      view.target.classList.remove("show");
-    }
-  });
-});
-
-const mediaElements1 = document.querySelectorAll(".word-1");
-mediaElements1.forEach((e) => mediaRun.observe(e));
-
-const mediaElements2 = document.querySelectorAll(".word-2");
-mediaElements2.forEach((e) => mediaRun.observe(e));
-
-const mediaElements3 = document.querySelectorAll(".word-box");
-mediaElements3.forEach((e) => mediaRun.observe(e));
-
 const wordInput = document.getElementById("word-input");
 const startBtn = document.getElementById("start-btn");
 const pauseBtn = document.getElementById("pause-btn");
@@ -121,7 +102,7 @@ let words = [
   "window",
 ];
 
-let remainingTime = 100;
+let remainingTime = 99;
 let score = 0;
 let isRunning = false;
 let intervalId;
@@ -218,3 +199,73 @@ function startGame() {
     }
   }, 1000);
 }
+
+function endGame() {
+  isRunning = false;
+  bgMusic.pause();
+  const finalScore = score;
+  const totalWords = finalScore + words.length;
+  const gameScore = new Score(finalScore, totalWords);
+  wordsContainer.innerHTML = `Game Over! ${"\n"} ${"<strong>"} Final Score: ${score} ${"</strong"}`;
+  startBtn.textContent = "Restart";
+  remainingTime = 99;
+  score = 0;
+  timeDisplay.textContent = remainingTime;
+  scoreDisplay.textContent = score;
+  console.log(gameScore);
+}
+
+const mediaRun = new IntersectionObserver((views) => {
+  views.forEach((view) => {
+    if (view.isIntersecting) {
+      view.target.classList.add("show");
+    } else {
+      view.target.classList.remove("show");
+    }
+  });
+});
+
+const mediaElements1 = document.querySelectorAll(".word-1");
+mediaElements1.forEach((e) => mediaRun.observe(e));
+
+const mediaElements2 = document.querySelectorAll(".word-2");
+mediaElements2.forEach((e) => mediaRun.observe(e));
+
+const mediaElements3 = document.querySelectorAll(".word-box");
+mediaElements3.forEach((e) => mediaRun.observe(e));
+
+function pauseGame() {
+  clearInterval(intervalId);
+  isRunning = false;
+  bgMusic.pause();
+}
+
+restartBtn.addEventListener("click", () => {
+  clearInterval(intervalId);
+  isRunning = false;
+  remainingTime = 99;
+  score = 0;
+  words = shuffle(words);
+  displayNewWord();
+  timeDisplay.textContent = remainingTime;
+  scoreDisplay.textContent = score;
+  startBtn.textContent = "Start";
+  bgMusic.pause();
+  bgMusic.currentTime = 0;
+  scoreDisplay.textContent = 0;
+});
+
+startBtn.addEventListener("click", () => {
+  startGame();
+  bgMusic.play();
+});
+
+pauseBtn.addEventListener("click", pauseGame);
+
+wordInput.addEventListener("input", () => {
+  const wordEntered = wordInput.value.trim().toLowerCase();
+  const currentWord = wordsContainer.textContent.trim().toLowerCase();
+  if (wordEntered === currentWord) {
+    displayNewWord();
+  }
+});
