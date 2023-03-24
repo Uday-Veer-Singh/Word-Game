@@ -11,8 +11,85 @@ body {
   height: 100vh;
 }
 
+#main-box {
+  display: grid;
+  align-items: center;
+  justify-content: center;
+  padding-top: 5rem;
+}
+
 h1 {
   font-family: "Pacifico", cursive;
   font-size: 60px;
   font-weight: normal;
+}
+
+p {
+  font-size: 16px;
+  letter-spacing: 0.6px;
+  margin: 1rem;
+}
+
+.word-box {
+  display: grid;
+  align-items: center;
+  justify-content: center;
+  width: 500px;
+  background-image: linear-gradient(to top, #fdfbfb 0%, #ebedee 100%);
+  color: #333;
+  border: 1px solid #cecece;
+  padding: 16px;
+  border-radius: 5px;
+  margin-bottom: 1em;
+}
+
+.score {
+  margin-top: 20px;
+  display: flex;
+}
+
+.input-field input {
+  font-size: 25px;
+  border: 1px solid #ddd;
+  padding: 16px;
+  border-radius: 5px;
+  text-align: center;
+  margin-top: 20px;
+}
+
+#start-btn,
+#pause-btn,
+#restart-btn {
+  padding: 10px 30px;
+  width: 100%;
+  font-size: 16px;
+  letter-spacing: 0.6px;
+  color: #fff;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+#start-btn {
+  /* background: #00c9ff; */
+  background-image: linear-gradient(120deg, #00c9ff 0%, #3a82ff 100%);
+  margin-right: 10px;
+}
+
+#pause-btn {
+  /* background: #ff758c; */
+  background-image: linear-gradient(120deg, #ff758c 0%, #8e00a0 100%);
+  margin-left: 10px;
+}
+
+#restart-btn {
+  background: transparent;
+  border: 1px solid #ddd;
+  color: #000;
+}
+
+.btn-row {
+  display: flex;
+  justify-content: space-between;
+  text-align: center;
 }

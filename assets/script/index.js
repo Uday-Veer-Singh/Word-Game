@@ -107,3 +107,52 @@ let score = 0;
 let isRunning = false;
 let intervalId;
 let gameStarted = false;
+
+class Score {
+  #date;
+  #hits;
+  #percentage;
+
+  // Use '_' because it is publicly in JS and '#' is used in private fields
+  constructor() {
+    this._date = new Date();
+    this._hits = 0;
+    this._percentage = 0;
+    this._scoreDisplay = document.getElementById("score-display");
+    if (this._scoreDisplay) {
+      this.updateDisplay();
+    }
+  }
+
+  get date() {
+    return this._date;
+  }
+
+  get hits() {
+    return this._hits;
+  }
+
+  get percentage() {
+    return this._percentage;
+  }
+
+  set hits(value) {
+    this._hits = value;
+    if (this._scoreDisplay) {
+      this.updateDisplay();
+    }
+  }
+
+  set percentage(value) {
+    this._percentage = value;
+    if (this._scoreDisplay) {
+      this.updateDisplay();
+    }
+  }
+
+  updateDisplay() {
+    if (this._scoreDisplay) {
+      this._scoreDisplay.textContent = `Hits: ${this._hits}, Percentage: ${this._percentage}%`;
+    }
+  }
+}
