@@ -190,6 +190,8 @@ function startGame() {
   displayNewWord();
   score = 0;
   scoreDisplay.textContent = score;
+  wordInput.disabled = false;
+  wordInput.focus();
   intervalId = setInterval(() => {
     remainingTime--;
     timeDisplay.textContent = remainingTime;
@@ -207,7 +209,6 @@ function endGame() {
   const totalWords = finalScore + words.length;
   const gameScore = new Score(finalScore, totalWords);
   wordsContainer.innerHTML = `Game Over! ${"\n"} ${"<strong>"} Final Score: ${score} ${"</strong"}`;
-  startBtn.textContent = "Restart";
   remainingTime = 99;
   score = 0;
   timeDisplay.textContent = remainingTime;
@@ -249,18 +250,28 @@ restartBtn.addEventListener("click", () => {
   displayNewWord();
   timeDisplay.textContent = remainingTime;
   scoreDisplay.textContent = score;
-  startBtn.textContent = "Start";
+  startBtn.textContent = "Restart";
   bgMusic.pause();
   bgMusic.currentTime = 0;
   scoreDisplay.textContent = 0;
 });
 
+// const startBtn = document.getElementById("start-btn");
+// const wordInput = document.getElementById("word-input");
+
+wordInput.addEventListener("keydown", (event) => {
+  if (!isRunning) {
+    event.preventDefault(); // Prevent text input before game starts
+  }
+});
+
 startBtn.addEventListener("click", () => {
   startGame();
   bgMusic.play();
+  startBtn.textContent = "Start over";
 });
 
-pauseBtn.addEventListener("click", pauseGame);
+// pauseBtn.addEventListener("click", pauseGame);
 
 wordInput.addEventListener("input", () => {
   const wordEntered = wordInput.value.trim().toLowerCase();

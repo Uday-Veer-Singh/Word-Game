@@ -114,7 +114,6 @@ p {
 #start-btn:hover,
 #pause-btn:hover,
 #restart-btn:hover {
-  font-size: 18px;
   box-shadow: 0px 0px 5px #555;
 }
 
