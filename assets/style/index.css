@@ -67,8 +67,8 @@ p {
   display: grid;
   align-items: center;
   justify-content: center;
-  width: 500px;
-  height: 100%;
+  width: 420px;
+  height: 400px;
   background-image: linear-gradient(to top, #fdfbfb 0%, #ebedee 100%);
   color: #333;
   border: 1px solid #cecece;
@@ -84,7 +84,7 @@ p {
   padding: 16px;
   border-radius: 5px;
   text-align: center;
-  margin-bottom: 20px;
+  margin: 20px;
 }
 
 #word-input:hover,
@@ -93,7 +93,6 @@ p {
 }
 
 #start-btn,
-#pause-btn,
 #restart-btn,
 #tough-mode {
   padding: 10px 30px;
@@ -111,23 +110,17 @@ p {
   margin-right: 10px;
 }
 
-#start-btn:hover,
-#pause-btn:hover,
-#restart-btn:hover {
-  box-shadow: 0px 0px 5px #555;
-}
-
-#pause-btn {
-  background-image: linear-gradient(240deg, #ff758c 0%, #ff3a5b 100%);
-  margin-left: 10px;
-}
-
 #restart-btn {
   background: #ddd;
   border: 1px solid #ddd;
   color: #000;
-
+  display: none;
   margin-bottom: 20px;
+}
+
+#start-btn:hover,
+#restart-btn:hover {
+  box-shadow: 0px 0px 5px #555;
 }
 
 .btn-row {
@@ -155,4 +148,21 @@ p {
   padding: 6px 20px;
   color: #fcfcfc;
   border-radius: 5px;
+}
+
+#score-display {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 260px;
+  padding: 15px;
+  background: #38ecbb;
+  z-index: 100;
+  transition: all 0.5s ease;
+}
+
+h3 {
+  text-transform: uppercase;
+  text-align: center;
 }

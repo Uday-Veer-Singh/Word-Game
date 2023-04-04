@@ -2,7 +2,6 @@
 
 const wordInput = document.getElementById("word-input");
 const startBtn = document.getElementById("start-btn");
-const pauseBtn = document.getElementById("pause-btn");
 const restartBtn = document.getElementById("restart-btn");
 const timeDisplay = document.getElementById("time");
 const scoreDisplay = document.getElementById("score");
@@ -102,63 +101,91 @@ let words = [
   "window",
 ];
 
-let remainingTime = 99;
+let remainingTime = 10;
 let score = 0;
 let isRunning = false;
 let intervalId;
 let gameStarted = false;
+let resultArr = "";
 
-// class for the outcomes
+const mediaRun = new IntersectionObserver((views) => {
+  views.forEach((view) => {
+    if (view.isIntersecting) {
+      view.target.classList.add("show");
+    } else {
+      view.target.classList.remove("show");
+    }
+  });
+});
+
+const mediaElements1 = document.querySelectorAll(".word-1");
+mediaElements1.forEach((e) => mediaRun.observe(e));
+
+const mediaElements2 = document.querySelectorAll(".word-2");
+mediaElements2.forEach((e) => mediaRun.observe(e));
+
+const mediaElements3 = document.querySelectorAll(".word-box");
+mediaElements3.forEach((e) => mediaRun.observe(e));
+
 class Score {
   #date;
   #hits;
   #percentage;
+  #finalScore;
+  #words;
+  #scoreDisplay;
 
-  // Use '_' because it is publicly in JS and '#' is used in private fields
-  constructor() {
-    this._date = new Date();
-    this._hits = 0;
-    this._percentage = 0;
-    this._scoreDisplay = document.getElementById("score-display");
-    if (this._scoreDisplay) {
+  constructor(finalScore, words) {
+    this.#finalScore = finalScore;
+    this.#words = words;
+    this.#date = new Date();
+    this.#hits = 0;
+    this.#percentage = 0;
+    this.#scoreDisplay = document.getElementById("score-display");
+    if (this.#scoreDisplay) {
       this.updateDisplay();
     }
   }
 
   get date() {
-    return this._date;
+    return this.#date;
   }
 
   get hits() {
-    return this._hits;
+    return this.#hits;
   }
 
   get percentage() {
-    return this._percentage;
+    if (this.#words.length === 0) {
+      return 0;
+    }
+    return (this.#finalScore / this.#words.length) * 100;
   }
 
   set hits(value) {
-    this._hits = value;
-    if (this._scoreDisplay) {
+    this.#hits = value;
+    if (this.#scoreDisplay) {
       this.updateDisplay();
     }
   }
 
   set percentage(value) {
-    this._percentage = value;
-    if (this._scoreDisplay) {
+    this.#hits = this.#finalScore;
+    this.#percentage = value;
+    if (this.#scoreDisplay) {
       this.updateDisplay();
     }
   }
 
   updateDisplay() {
-    if (this._scoreDisplay) {
-      this._scoreDisplay.textContent = `Hits: ${this._hits}, Percentage: ${this._percentage}%`;
+    if (this.#scoreDisplay) {
+      this.#scoreDisplay.textContent = `Hits: ${this.#hits}, Percentage: ${
+        this.#percentage
+      }%`;
     }
   }
 }
 
-// shuffling the words in array
 function shuffle(array) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -167,7 +194,6 @@ function shuffle(array) {
   return array;
 }
 
-// function for displaying new word if the entered word is same as pop-up word
 function displayNewWord() {
   if (words.length === 0) {
     endGame();
@@ -213,47 +239,93 @@ function endGame() {
   score = 0;
   timeDisplay.textContent = remainingTime;
   scoreDisplay.textContent = score;
+  wordInput.setAttribute("readonly", "");
   console.log(gameScore);
+  handleLocalStorage(gameScore);
 }
 
-const mediaRun = new IntersectionObserver((views) => {
-  views.forEach((view) => {
-    if (view.isIntersecting) {
-      view.target.classList.add("show");
-    } else {
-      view.target.classList.remove("show");
-    }
-  });
+function handleLocalStorage(gameScore) {
+  let previousScores = JSON.parse(localStorage.getItem("scores")) || [];
+  let currentScore = {
+    hits: gameScore.hits,
+    percentage: gameScore.percentage,
+    finalScore: gameScore.finalScore,
+  };
+
+  // Add the currentScore to the array of previous scores
+  previousScores.push(currentScore);
+
+  // Sort the array in descending order by the finalScore property
+  previousScores.sort((a, b) => b.finalScore - a.finalScore);
+
+  // Limit the array to the top 10 scores
+  previousScores.splice(10);
+
+  // Store the updated array in localStorage
+  localStorage.setItem("scores", JSON.stringify(previousScores));
+}
+
+// Display the scoreboard on page load
+window.addEventListener("load", () => {
+  let previousScores = JSON.parse(localStorage.getItem("scores")) || [];
+
+  // Display the Top results
+  let resultArr =
+    "<h2>Top results:</h2><div style='display:flex; flex-direction:column; justify-content:center; align-items:center'>";
+  for (let i = 0; i < Math.min(previousScores.length, 10); i++) {
+    let percentage = previousScores[i].percentage
+      ? previousScores[i].percentage.toFixed(2)
+      : "N/A";
+    resultArr += `<p style='margin: 10px'>#${i + 1}: ${
+      previousScores[i].finalScore
+    } words ${percentage}%</p>`;
+  }
+
+  resultArr += "</div>";
+  document.getElementById("score-display").innerHTML = resultArr;
 });
 
-const mediaElements1 = document.querySelectorAll(".word-1");
-mediaElements1.forEach((e) => mediaRun.observe(e));
-
-const mediaElements2 = document.querySelectorAll(".word-2");
-mediaElements2.forEach((e) => mediaRun.observe(e));
-
-const mediaElements3 = document.querySelectorAll(".word-box");
-mediaElements3.forEach((e) => mediaRun.observe(e));
-
-function pauseGame() {
-  clearInterval(intervalId);
-  isRunning = false;
-  bgMusic.pause();
+function startGame() {
+  if (isRunning) return;
+  isRunning = true;
+  bgMusic.play();
+  words = shuffle(words);
+  displayNewWord();
+  score = 0;
+  scoreDisplay.textContent = score;
+  wordInput.disabled = false;
+  wordInput.focus();
+  intervalId = setInterval(() => {
+    remainingTime--;
+    timeDisplay.textContent = remainingTime;
+    if (remainingTime === 0) {
+      clearInterval(intervalId);
+      endGame();
+    }
+  }, 1000);
 }
 
 restartBtn.addEventListener("click", () => {
   clearInterval(intervalId);
-  isRunning = false;
+  isRunning = true;
   remainingTime = 99;
   score = 0;
   words = shuffle(words);
   displayNewWord();
+  wordInput.focus();
   timeDisplay.textContent = remainingTime;
   scoreDisplay.textContent = score;
   startBtn.textContent = "Restart";
-  bgMusic.pause();
   bgMusic.currentTime = 0;
   scoreDisplay.textContent = 0;
+  intervalId = setInterval(() => {
+    remainingTime--;
+    timeDisplay.textContent = remainingTime;
+    if (remainingTime === 0) {
+      clearInterval(intervalId);
+      endGame();
+    }
+  }, 1000);
 });
 
 // const startBtn = document.getElementById("start-btn");
@@ -268,7 +340,9 @@ wordInput.addEventListener("keydown", (event) => {
 startBtn.addEventListener("click", () => {
   startGame();
   bgMusic.play();
-  startBtn.textContent = "Start over";
+  wordInput.removeAttribute("readonly");
+  startBtn.style.display = "none";
+  restartBtn.style.display = "block";
 });
 
 // pauseBtn.addEventListener("click", pauseGame);

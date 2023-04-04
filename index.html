@@ -30,16 +30,15 @@
     <p>Enter as many words as possible in 99 seconds!</p>
     <div class="word-box">
       <div class="score">
-        <p class="timer">Timer: <span id="time"></span></p>
-        <p class="score">Your score: <span id="score"></span></p>
+        <p class="timer">Timer:<strong> <span id="time"></span></strong></p>
+        <p class="score">Your score:<strong> <span id="score"></span></strong></p>
       </div>
       <div class="words"></div>
       <div class="input-field">
-        <input type="text" id="word-input" placeholder="Enter words here" readonly>
+        <input type="text" id="word-input" readonly>
 
         <div class="btn-row">
           <button id="start-btn">Let's begin</button>
-          <!-- <button id="pause-btn">Pause</button> -->
         </div>
         <div class="btn-col">
           <button id="restart-btn">Restart</button>
@@ -48,6 +47,8 @@
 
 
     </div>
+  </div>
+  <div id="score-display">
   </div>
 
   </div>
