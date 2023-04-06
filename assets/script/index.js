@@ -7,7 +7,7 @@ const timeDisplay = document.getElementById("time");
 const scoreDisplay = document.getElementById("score");
 const wordsContainer = document.querySelector(".words");
 const bgMusic = document.getElementById("bg-music");
-const resultDisplay = document.getElementById("score-display");
+let resultDisplay = document.getElementById("score-display");
 
 let words = [
   "dinosaur",
@@ -197,6 +197,7 @@ class Score {
 
 function handleLocalStorage(gameScore) {
   let previousScores = JSON.parse(localStorage.getItem("scores")) || [];
+
   let currentScore = {
     hits: gameScore.hits,
     percentage: gameScore.percentage.toFixed(2),
@@ -215,20 +216,30 @@ function handleLocalStorage(gameScore) {
   // Store the updated array in localStorage
   localStorage.setItem("scores", JSON.stringify(previousScores));
 
-  // Display the Top results
-  let resultArr =
-    "<h2>Top results:</h2><div style='display:flex; flex-direction:column; justify-content:center; align-items:center'>";
-  for (let i = 0; i < Math.min(previousScores.length, 10); i++) {
-    let percentage = previousScores[i].percentage
-      ? previousScores[i].percentage + "%"
-      : "N/A";
-    resultArr += `<p style='margin: 10px'>#${i + 1}: ${
-      previousScores[i].finalScore
-    } words (${previousScores[i].hits} hits, ${percentage})</p>`;
+  let resultDisplay = document.getElementById("score-display");
+
+  if (previousScores.length === 0) {
+    // if there are no previous scores, hide the resultDisplay
+    resultDisplay.style.display = "none";
+  } else {
+    // otherwise, show the resultDisplay and display the top results
+    resultDisplay.style.display = "block";
+
+    let resultArr =
+      "<h2>Top results:</h2><div style='display:flex; flex-direction:column; justify-content:center; align-items:center'>";
+    for (let i = 0; i < Math.min(previousScores.length, 10); i++) {
+      let percentage = previousScores[i].percentage
+        ? previousScores[i].percentage + "%"
+        : "N/A";
+      resultArr += `<p style='display:flex; flex-direction:row; justify-content:space-between;margin: 10px'>#${
+        i + 1
+      }: <span style=padding-left:20px;>${
+        previousScores[i].finalScore
+      } words</span> <span style=padding-left:20px;> ${percentage}</span></p>`;
+    }
+    resultArr += "</div>";
+    resultDisplay.innerHTML = resultArr;
   }
-  resultArr += "</div>";
-  document.getElementById("score-display").innerHTML = resultArr;
-  resultDisplay.style.display = "block";
 }
 
 restartBtn.addEventListener("click", () => {
@@ -243,6 +254,7 @@ restartBtn.addEventListener("click", () => {
   scoreDisplay.textContent = score;
   startBtn.textContent = "Restart";
   bgMusic.currentTime = 0;
+  bgMusic.play();
   scoreDisplay.textContent = 0;
   intervalId = setInterval(() => {
     remainingTime--;

@@ -156,12 +156,11 @@ p {
 
 #score-display {
   position: fixed;
-  display: none;
   top: 0;
   right: 0;
   height: 100%;
-  width: 270px;
-  padding: 15px;
+  width: 220px;
+  padding: 15px 0px;
   background: #38ecbb;
   z-index: 100;
   transition: all 0.5s ease;
