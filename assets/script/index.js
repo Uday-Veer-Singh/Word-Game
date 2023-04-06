@@ -102,7 +102,7 @@ let words = [
   "window",
 ];
 
-let remainingTime = 10;
+let remainingTime = 99;
 let score = 0;
 let isRunning = false;
 let intervalId;
