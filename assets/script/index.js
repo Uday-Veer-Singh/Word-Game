@@ -7,6 +7,7 @@ const timeDisplay = document.getElementById("time");
 const scoreDisplay = document.getElementById("score");
 const wordsContainer = document.querySelector(".words");
 const bgMusic = document.getElementById("bg-music");
+const resultDisplay = document.getElementById("score-display");
 
 let words = [
   "dinosaur",
@@ -127,65 +128,6 @@ mediaElements2.forEach((e) => mediaRun.observe(e));
 const mediaElements3 = document.querySelectorAll(".word-box");
 mediaElements3.forEach((e) => mediaRun.observe(e));
 
-class Score {
-  #date;
-  #hits;
-  #percentage;
-  #finalScore;
-  #words;
-  #scoreDisplay;
-
-  constructor(finalScore, words) {
-    this.#finalScore = finalScore;
-    this.#words = words;
-    this.#date = new Date();
-    this.#hits = 0;
-    this.#percentage = 0;
-    this.#scoreDisplay = document.getElementById("score-display");
-    if (this.#scoreDisplay) {
-      this.updateDisplay();
-    }
-  }
-
-  get date() {
-    return this.#date;
-  }
-
-  get hits() {
-    return this.#hits;
-  }
-
-  get percentage() {
-    if (this.#words.length === 0) {
-      return 0;
-    }
-    return (this.#finalScore / this.#words.length) * 100;
-  }
-
-  set hits(value) {
-    this.#hits = value;
-    if (this.#scoreDisplay) {
-      this.updateDisplay();
-    }
-  }
-
-  set percentage(value) {
-    this.#hits = this.#finalScore;
-    this.#percentage = value;
-    if (this.#scoreDisplay) {
-      this.updateDisplay();
-    }
-  }
-
-  updateDisplay() {
-    if (this.#scoreDisplay) {
-      this.#scoreDisplay.textContent = `Hits: ${this.#hits}, Percentage: ${
-        this.#percentage
-      }%`;
-    }
-  }
-}
-
 function shuffle(array) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -244,11 +186,20 @@ function endGame() {
   handleLocalStorage(gameScore);
 }
 
+class Score {
+  constructor(finalScore, totalWords) {
+    this.finalScore = finalScore;
+    this.totalWords = totalWords;
+    this.hits = finalScore;
+    this.percentage = totalWords ? (finalScore / totalWords) * 100 : 0;
+  }
+}
+
 function handleLocalStorage(gameScore) {
   let previousScores = JSON.parse(localStorage.getItem("scores")) || [];
   let currentScore = {
     hits: gameScore.hits,
-    percentage: gameScore.percentage,
+    percentage: gameScore.percentage.toFixed(2),
     finalScore: gameScore.finalScore,
   };
 
@@ -263,46 +214,21 @@ function handleLocalStorage(gameScore) {
 
   // Store the updated array in localStorage
   localStorage.setItem("scores", JSON.stringify(previousScores));
-}
-
-// Display the scoreboard on page load
-window.addEventListener("load", () => {
-  let previousScores = JSON.parse(localStorage.getItem("scores")) || [];
 
   // Display the Top results
   let resultArr =
     "<h2>Top results:</h2><div style='display:flex; flex-direction:column; justify-content:center; align-items:center'>";
   for (let i = 0; i < Math.min(previousScores.length, 10); i++) {
     let percentage = previousScores[i].percentage
-      ? previousScores[i].percentage.toFixed(2)
+      ? previousScores[i].percentage + "%"
       : "N/A";
     resultArr += `<p style='margin: 10px'>#${i + 1}: ${
       previousScores[i].finalScore
-    } words ${percentage}%</p>`;
+    } words (${previousScores[i].hits} hits, ${percentage})</p>`;
   }
-
   resultArr += "</div>";
   document.getElementById("score-display").innerHTML = resultArr;
-});
-
-function startGame() {
-  if (isRunning) return;
-  isRunning = true;
-  bgMusic.play();
-  words = shuffle(words);
-  displayNewWord();
-  score = 0;
-  scoreDisplay.textContent = score;
-  wordInput.disabled = false;
-  wordInput.focus();
-  intervalId = setInterval(() => {
-    remainingTime--;
-    timeDisplay.textContent = remainingTime;
-    if (remainingTime === 0) {
-      clearInterval(intervalId);
-      endGame();
-    }
-  }, 1000);
+  resultDisplay.style.display = "block";
 }
 
 restartBtn.addEventListener("click", () => {
